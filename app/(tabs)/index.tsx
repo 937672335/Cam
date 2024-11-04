@@ -5,6 +5,7 @@ import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import PhotoPickerSection from '@/components/PhotoPickerSection';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -50,9 +51,11 @@ export default function HomeScreen() {
         </ThemedText>
       </ThemedView>
 
-      {/* 添加进入相机的按钮 */}
       <View style={styles.buttonContainer}>
         <Button title="Open Camera" onPress={() => router.push('/camera')} />
+      </View>
+      <View style={styles.buttonContainer}>
+        <PhotoPickerSection />
       </View>
     </ParallaxScrollView>
   );

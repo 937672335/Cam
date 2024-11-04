@@ -1,33 +1,60 @@
-import { Fontisto } from '@expo/vector-icons';
 import { CameraCapturedPicture } from 'expo-camera';
-import React from 'react'
-import { TouchableOpacity, SafeAreaView, Image, StyleSheet, View } from 'react-native';
+import React from 'react';
+import { Button, SafeAreaView, Image, StyleSheet, View, Alert } from 'react-native';
+import * as MediaLibrary from 'expo-media-library';
 
 const PhotoPreviewSection = ({
     photo,
-    handleRetakePhoto
+    handleRetakePhoto,
 }: {
     photo: CameraCapturedPicture;
     handleRetakePhoto: () => void;
-}) => (
-    <SafeAreaView style={styles.container}>
-        <View style={styles.box}>
-            <Image
-                style={styles.previewConatiner}
-                source={{uri: 'data:image/jpg;base64,' + photo.base64}}
-            />
-        </View>
+}) => {
+    const handleSavePhoto = async () => {
+        const { status } = await MediaLibrary.requestPermissionsAsync();
+        if (status === 'granted') {
+            try {
+                await MediaLibrary.saveToLibraryAsync(photo.uri);
+                Alert.alert(
+                    'Photo saved to camera roll!',
+                    '',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: handleRetakePhoto,
+                        },
+                    ],
+                    { cancelable: false }
+                );
+            } catch (error) {
+                console.error('Error saving photo:', error);
+            }
+        } else {
+            Alert.alert('Permission to access camera roll is required!');
+        }
+    };
 
-        <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={handleRetakePhoto}>
-                <Fontisto name='trash' size={36} color='black' />
-            </TouchableOpacity>
-        </View>
-    </SafeAreaView>
-);
+    return (
+        <SafeAreaView style={styles.container}>
+            <View style={styles.box}>
+                <Image
+                    style={styles.previewContainer}
+                    source={{ uri: 'data:image/jpg;base64,' + photo.base64 }}
+                />
+            </View>
+
+            <View style={styles.buttonContainer}>
+                {/* Delete button */}
+                <Button title="Delete" onPress={handleRetakePhoto} />
+                {/* Save button */}
+                <Button title="Save" onPress={handleSavePhoto} />
+            </View>
+        </SafeAreaView>
+    );
+};
 
 const styles = StyleSheet.create({
-    container:{
+    container: {
         flex: 1,
         backgroundColor: 'black',
         alignItems: 'center',
@@ -39,27 +66,19 @@ const styles = StyleSheet.create({
         width: '95%',
         backgroundColor: 'darkgray',
         justifyContent: 'center',
-        alignItems: "center",
+        alignItems: 'center',
     },
-    previewConatiner: {
+    previewContainer: {
         width: '95%',
         height: '85%',
-        borderRadius: 15
+        borderRadius: 15,
     },
     buttonContainer: {
         marginTop: '4%',
         flexDirection: 'row',
-        justifyContent: "center",
+        justifyContent: 'space-around',
         width: '100%',
     },
-    button: {
-        backgroundColor: 'gray',
-        borderRadius: 25,
-        padding: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-    }
-
 });
 
 export default PhotoPreviewSection;
